@@ -8,13 +8,11 @@ A Python implementation of Bitcoin's UTXO (Unspent Transaction Output) model, de
 
 ## Team Information
 
-**Team Name:** [Your Team Name]
+**Team Name:** Team Punju
 
 **Team Members:**
-1. [Name 1] - [Roll Number]
+1. Praneeth - 240008009
 2. [Name 2] - [Roll Number]
-3. [Name 3] - [Roll Number]
-4. [Name 4] - [Roll Number]
 
 ---
 
