@@ -1,0 +1,7 @@
+# Bitcoin UTXO Simulator
+# CS 216: Introduction to Blockchain
+
+# No external dependencies required!
+# This project uses only Python standard library.
+
+# Python version: 3.8+

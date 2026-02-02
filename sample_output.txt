@@ -1,0 +1,189 @@
+
+######################################################################
+#                    RUNNING ALL TEST SCENARIOS                     #
+######################################################################
+
+======================================================================
+TEST 1: Basic Valid Transaction
+======================================================================
+Initial state:
+  Alice balance: 50.0000 BTC
+  Bob balance: 30.0000 BTC
+
+Transaction created: tx_1770055994_6676
+  Inputs: 1
+  Outputs: 2
+
+Transaction VALID
+  Fee: 0.0010 BTC
+  Has change output: True
+  Has recipient output: True
+
+Mempool add: Transaction added to mempool. Fee: 0.0010 BTC
+
+Result: ✓ PASSED
+
+======================================================================
+TEST 2: Multiple Inputs
+======================================================================
+Initial state:
+  Alice balance: 70.0000 BTC
+  Alice UTXOs: 2
+
+Transaction: Alice -> Bob (60 BTC using 2 inputs)
+Transaction VALID
+  Fee: 0.0010 BTC
+  Inputs used: 2
+
+Result: ✓ PASSED
+Details: Used 2 inputs, fee = 0.0010
+
+======================================================================
+TEST 3: Double-Spend in Same Transaction
+======================================================================
+Attempting to spend same UTXO (genesis, 0) twice...
+
+Transaction correctly REJECTED
+  Reason: Double-spend detected: UTXO (genesis, 0) used multiple times in same transaction
+
+Result: ✓ PASSED
+
+======================================================================
+TEST 4: Mempool Double-Spend Detection
+======================================================================
+TX1: Alice -> Bob (10 BTC)
+  Result: Transaction added to mempool. Fee: 0.0010 BTC
+
+TX2: Alice -> Charlie (10 BTC, SAME UTXO)
+  Result: UTXO (genesis, 0) already spent in mempool (pending transaction)
+
+Result: ✓ PASSED
+Details: TX1 accepted: True, TX2 rejected: True
+
+======================================================================
+TEST 5: Insufficient Funds
+======================================================================
+Bob's balance: 30.0000 BTC
+Bob attempts to send 35 BTC to Alice...
+
+Transaction correctly REJECTED
+  Reason: Insufficient input: 30.0000 BTC < 35.0000 BTC output
+
+Result: ✓ PASSED
+
+======================================================================
+TEST 6: Negative Amount Output
+======================================================================
+Attempting transaction with negative output amount...
+
+Transaction correctly REJECTED
+  Reason: Output 0 has negative amount: -10.0 BTC
+
+Result: ✓ PASSED
+
+======================================================================
+TEST 7: Zero Fee Transaction
+======================================================================
+Creating transaction with zero fee (inputs = outputs)...
+
+Transaction ACCEPTED
+  Fee: 0.0000 BTC
+
+Result: ✓ PASSED
+Details: Zero fee transaction accepted as expected
+
+======================================================================
+TEST 8: Race Attack Simulation (First-Seen Rule)
+======================================================================
+TX1 (Merchant, LOW FEE): Alice -> Merchant (49.999 BTC)
+  Result: Transaction added to mempool. Fee: 0.0010 BTC
+
+TX2 (Attack, HIGH FEE): Alice -> Attacker (49.0 BTC)
+  Result: UTXO (genesis, 0) already spent in mempool (pending transaction)
+
+--- First-Seen Rule Applied ---
+Even though TX2 has higher fee, TX1 arrived first and is protected.
+
+Result: ✓ PASSED
+Details: Merchant TX accepted: True, Attack TX rejected: True
+
+======================================================================
+TEST 9: Complete Mining Flow
+======================================================================
+Initial balances:
+  Alice: 50.0000 BTC
+  Bob: 30.0000 BTC
+  Charlie: 20.0000 BTC
+  David: 10.0000 BTC
+  Eve: 5.0000 BTC
+
+Adding transactions to mempool...
+Mempool size: 3 transactions
+
+--- Mining Block ---
+
+Mining block...
+Selected 3 transactions from mempool.
+  - Processed tx1 (fee: 0.0100 BTC)
+  - Processed tx2 (fee: 0.0100 BTC)
+  - Processed tx3 (fee: 0.0050 BTC)
+
+Coinbase: Miner Miner1 receives 0.0250 BTC in fees
+
+Block block_1770055994_6798 mined successfully!
+Total fees: 0.0250 BTC
+Removed 3 transactions from mempool.
+Mempool now has 0 transactions.
+
+
+Post-mining verification:
+  Mempool size: 0
+  Blockchain length: 1
+  Miner1 balance: 0.0250 BTC
+
+Final balances:
+  Alice: 39.9900 BTC
+  Bob: 24.9900 BTC
+  Charlie: 29.9950 BTC
+  David: 15.0000 BTC
+  Eve: 5.0000 BTC
+  Miner1: 0.0250 BTC
+
+Result: ✓ PASSED
+Details: Mempool cleared: True, Miner got fees: True, Block added: True
+
+======================================================================
+TEST 10: Unconfirmed Chain (Spending Unconfirmed UTXO)
+======================================================================
+TX1: Alice -> Bob (10 BTC)
+  Result: Transaction added to mempool. Fee: 0.0010 BTC
+
+TX2: Bob -> Charlie (trying to spend unconfirmed UTXO)
+
+Transaction correctly REJECTED
+  Reason: Input 0: UTXO (tx1_alice_bob, 0) does not exist
+
+--- Design Decision ---
+We reject spending unconfirmed UTXOs (simpler approach).
+Alternative: Track parent-child dependencies (more complex).
+
+Result: ✓ PASSED
+Details: Unconfirmed UTXO spending rejected as expected
+
+######################################################################
+#                         TEST SUMMARY                              #
+######################################################################
+  Test  1: Basic Valid Transaction                  ✓ PASSED
+  Test  2: Multiple Inputs                          ✓ PASSED
+  Test  3: Double-Spend in Same Transaction         ✓ PASSED
+  Test  4: Mempool Double-Spend Detection           ✓ PASSED
+  Test  5: Insufficient Funds                       ✓ PASSED
+  Test  6: Negative Amount Output                   ✓ PASSED
+  Test  7: Zero Fee Transaction                     ✓ PASSED
+  Test  8: Race Attack Simulation                   ✓ PASSED
+  Test  9: Complete Mining Flow                     ✓ PASSED
+  Test 10: Unconfirmed Chain                        ✓ PASSED
+----------------------------------------------------------------------
+  Total: 10/10 tests passed
+######################################################################
+
