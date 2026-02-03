@@ -12,7 +12,9 @@ A Python implementation of Bitcoin's UTXO (Unspent Transaction Output) model, de
 
 **Team Members:**
 1. Praneeth - 240008009
-2. [Name 2] - [Roll Number]
+2. Mahidhar - 240001030
+3. Santosh - 240004013
+4. Ashok- 240001050
 
 ---
 
